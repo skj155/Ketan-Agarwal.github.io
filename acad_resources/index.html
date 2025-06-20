@@ -154,6 +154,7 @@
 
   .back-btn {
     display: block;
+    position: fixed;
     margin-bottom: 1rem;
     padding: 0.5rem 1rem;
     background-color: #ddd;
@@ -161,7 +162,8 @@
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-
+    right: 10px;
+    bottom: 10px;
   }
 
   .mobhidden {
@@ -179,24 +181,22 @@
 
   <div class="container">
     <div class="column active" id="courseColumn">
-      <button class="back-btn" onclick="goBack()" style="display:none;">← Back</button>
     </div>
   
     <div class="column" id="typeColumn">
-      <button class="back-btn" onclick="goBack()">← Back</button>
     </div>
-  
+    
     <div class="column" id="resourceColumn">
-      <button class="back-btn" onclick="goBack()">← Back</button>
     </div>
   </div>
+  <button id="backbutton" class="back-btn mobhidden" onclick="goBack()">← Back</button>
   
   <script src="data.js"></script>
   <script>
   const courseColumn = document.getElementById("courseColumn");
 const typeColumn = document.getElementById("typeColumn");
 const resourceColumn = document.getElementById("resourceColumn");
-
+const backbutton = document.getElementById("backbutton");
 let selectedCourse = null;
 let viewStack = ["courseColumn"];
 const VIEWS = {
@@ -214,6 +214,7 @@ function createElement(tag, className, text, handler) {
   return el;
 }
 function switchView(toView) {
+  
   if (window.innerWidth <= 768) {
     Object.values(VIEWS).forEach(viewId => {
       document.getElementById(viewId).classList.remove("active");
@@ -221,6 +222,13 @@ function switchView(toView) {
     });
     document.getElementById(toView).classList.add("active");
     currentView = toView;
+  }
+
+  if (currentView == VIEWS.COURSE) {
+    backbutton.classList.add("mobhidden");
+  }
+  else if (backbutton.classList.contains("mobhidden")){
+    backbutton.classList.remove("mobhidden");
   }
 }
 
@@ -240,6 +248,7 @@ function goBack() {
 }
 
 function loadCourses() {
+
   courseColumn.innerHTML = '';
   Object.keys(data).forEach(code => {
     const course = data[code];
@@ -251,72 +260,67 @@ function loadCourses() {
     courseColumn.appendChild(courseEl);
   });
 
-  resourceColumn.classList.add("mobhidden");
-  typeColumn.classList.add("mobhidden");
   
 }
 
 function loadResourceTypes(course) {
-  if (currentView == VIEWS.COURSE) {
-    typeColumn.innerHTML = '<button class="back-btn" onclick="goBack()">← Back</button>';
-  }
-  else {
-    typeColumn.innerHTML = '';
-  }
-  
+
+    typeColumn.innerHTML = '';  
   const title = createElement("div", "title", `${course.code}`);
   typeColumn.append(title);
 
   for (let type in course.resources) {
     const typeEl = createElement("div", "resource-type", type, () => {
-      loadResources(type);
+      loadResources(type, course);
       switchView(VIEWS.RESOURCE);
     });
     typeColumn.appendChild(typeEl);
   }
-  courseColumn.classList.add('mobhidden');
-  resourceColumn.classList.add('mobhidden');
 }
 
-
-function loadResources(type) {
-  resourceColumn.innerHTML = '<button class="back-btn" onclick="goBack()">← Back</button>';
+function loadResources(type, course) {
+  resourceColumn.innerHTML = '';
   const res = selectedCourse.resources[type];
+  const title = createElement("div", "title", `${course.code} > ${type}`);
+  resourceColumn.append(title);
 
-  if (type === "PYQs" && typeof res === "object") {
-    for (let year in res) {
-      const acc = createElement("button", "toggle", `${year}`);
-      const panel = createElement("div", "panel");
-      res[year].forEach(({ title, link }) => {
-        const item = createElement("div", "resource-link");
-        const a = document.createElement("a");
-        a.href = link;
-        a.target = "_blank";
-        a.textContent = title;
-        item.appendChild(a);
-        panel.appendChild(item);
-      });
-      acc.addEventListener("click", function () {
-        this.classList.toggle("active");
-        panel.style.display = panel.style.display === "flex" ? "none" : "flex";
-      });
-      resourceColumn.appendChild(acc);
-      resourceColumn.appendChild(panel);
-    }
-  } else {
-    res.forEach(({ title, link }) => {
+  if (!res || (Array.isArray(res) && res.length === 0)) {
+    resourceColumn.append('No resources found.');
+    return;
+  }
+
+  renderResources(resourceColumn, res);
+}
+
+function renderResources(parent, data) {
+  if (Array.isArray(data)) {
+    data.forEach(({ title, link }) => {
       const item = createElement("div", "resource-link");
       const a = document.createElement("a");
       a.href = link;
       a.target = "_blank";
       a.textContent = title;
       item.appendChild(a);
-      resourceColumn.appendChild(item);
+      parent.appendChild(item);
     });
+  } else if (typeof data === "object") {
+    for (let key in data) {
+      const acc = createElement("button", "toggle", key);
+      const panel = createElement("div", "panel");
+
+      acc.addEventListener("click", function () {
+        this.classList.toggle("active");
+        panel.style.display = panel.style.display === "flex" ? "none" : "flex";
+      });
+
+      parent.appendChild(acc);
+      parent.appendChild(panel);
+
+      renderResources(panel, data[key]);
+    }
   }
-  typeColumn.classList.add("mobhidden");
-  courseColumn.classList.add("mobhidden");
 }
+
 
 
 loadCourses();
