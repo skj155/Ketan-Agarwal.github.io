@@ -163,6 +163,10 @@ position: sticky    }
       font-size: x-large;
       text-align: center;
       margin: 20px;
+      border-radius: 4px;
+      /* border: 2px solid var(--secondary); */
+      background-color: var(--secondary);
+      
     }
 
     .back-btn{
@@ -290,12 +294,13 @@ function goBack() {
 
 function loadCourses() {
 
-  courseColumn.innerHTML = '';
+  courseColumn.innerHTML = '<div class="title"> Courses </div>';
   Object.keys(data).forEach(code => {
     const course = data[code];
     const courseEl = createElement("div", "course", ``, () => {
       selectedCourse = course;
       loadResourceTypes(course);
+      resourceColumn.innerHTML = '';
       switchView(VIEWS.TYPE);
     });
     const wrapper = document.createElement("div", className = "wrapper1");
