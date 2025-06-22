@@ -3,16 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Course Resources</title>
+  <title>Course Repository</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
+
+    :root{
+      --background: #FFF2E0;
+      --primary: #898AC4;
+      --secondary: #C0C9EE;
+      --back: #A2AADB;
+
+    }
     * {
       box-sizing: border-box;
-      font-family: "Segoe UI", sans-serif;
+      font-family: "Roboto", sans-serif;
     }
 
     body {
       margin: 0;
-      background-color: #f4f4f4;
+      background-color: var(--background);
       overflow-x: hidden;
     }
 
@@ -52,13 +63,13 @@
       cursor: pointer;
       padding: 0.5rem;
       margin-bottom: 0.25rem;
-      background-color: white;
+      background-color: var(--primary);
       border-radius: 5px;
       transition: all 0.2s ease-in-out;
     }
 
     .course:hover {
-      background-color: #e0e0e0;
+      background-color: var(--primary);
       transform: translateX(8px);
     }
 
@@ -66,27 +77,60 @@
       cursor: pointer;
       margin: 0.5rem 0;
       padding: 0.5rem;
-      background-color: #fff;
+      background-color: var(--secondary);
       border-radius: 4px;
       transition: all 0.2s;
     }
 
     .resource-type:hover {
       transform: scale(1.02);
-      background-color: #e0e0e0;
     }
 
     .resource-link {
       padding: 0.4rem;
       margin: 0.2rem 0;
       background-color: #fff;
-      border-right: 4px solid #007BFF;
+      border-right: 4px solid var(--secondary);
       border-top: 1px solid grey;
       border-left: 1px solid grey;
-      border-bottom: 4px solid #007BFF;
-      border-radius: 3px;
+      border-bottom: 4px solid var(--secondary);
+      border-radius: 0.4em;
+      overflow: hidden;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
+    .resource-link a{
+      text-decoration: none;
+    }
+
+    .prev-btn{
+  background-color: #fff;
+  border: 1px solid var(--primary);
+  padding: 5px;
+  /* right: 0; */
+  width: 5em;
+  height: 2em;
+  transition: 0.5s;
+  /* font-size: 14px; */
+  border-radius: 0.4em;
+position: sticky    }
+
+  .close-btn {
+    background-color: var(--primary);
+    transition: all 0.1s ease-in;
+  }
+
+  .close-btn:hover {
+    scale: 1.2;
+  }
+
+  .prev-btn:hover {
+  background-color: var(--primary);
+  color: white;
+
+  }
     .hidden {
       display: none;
     }
@@ -96,8 +140,7 @@
     }
 
     .toggle {
-      background-color: #eee;
-      color: #444;
+      background-color: var(--secondary);
       cursor: pointer;
       padding: 0.5rem;
       margin: 0.3rem 0;
@@ -105,12 +148,8 @@
       text-align: left;
       outline: none;
       font-size: 1rem;
-      transition: 0.2s;
+      transition: 0.1s;
       border-radius: 4px;
-    }
-
-    .active, .toggle:hover {
-      background-color: #ccc;
     }
 
     .panel {
@@ -121,7 +160,7 @@
     }
 
     .title {
-      font-size: larger;
+      font-size: x-large;
       text-align: center;
       margin: 20px;
     }
@@ -157,14 +196,16 @@
     position: fixed;
     margin-bottom: 1rem;
     padding: 0.5rem 1rem;
-    background-color: #ddd;
+    background-color: var(--back);
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-    right: 10px;
+    right: 20px;
     bottom: 10px;
   }
+
+
 
   .mobhidden {
     display: none;
@@ -173,11 +214,11 @@
 
 
   </style>
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
 
-  <nav><a href="https://www.iitk.ac.in/counsel/">ICS Courses</a></nav>
+  <nav><a href="https://www.iitk.ac.in/counsel/">Course Repository</a></nav>
 
   <div class="container">
     <div class="column active" id="courseColumn">
@@ -252,11 +293,21 @@ function loadCourses() {
   courseColumn.innerHTML = '';
   Object.keys(data).forEach(code => {
     const course = data[code];
-    const courseEl = createElement("div", "course", `${code} - ${course.name}`, () => {
+    const courseEl = createElement("div", "course", ``, () => {
       selectedCourse = course;
       loadResourceTypes(course);
       switchView(VIEWS.TYPE);
     });
+    const wrapper = document.createElement("div", className = "wrapper1");
+    const span1 = createElement("span","left-span",`${course.name}`);
+    const span2 = createElement("span","right-span",`${course.code}`);
+    wrapper.className = "flex justify-between";
+    
+    
+    wrapper.appendChild(span1);
+    wrapper.appendChild(span2);
+    courseEl.appendChild(wrapper);
+
     courseColumn.appendChild(courseEl);
   });
 
@@ -266,7 +317,7 @@ function loadCourses() {
 function loadResourceTypes(course) {
 
     typeColumn.innerHTML = '';  
-  const title = createElement("div", "title", `${course.code}`);
+  const title = createElement("div", "title", `${course.code} - ${course.name}`);
   typeColumn.append(title);
 
   for (let type in course.resources) {
@@ -297,10 +348,17 @@ function renderResources(parent, data) {
     data.forEach(({ title, link }) => {
       const item = createElement("div", "resource-link");
       const a = document.createElement("a");
+      const prev = document.createElement("button");
+      prev.classList.add("prev-btn");
+      prev.innerHTML = "Preview";
       a.href = link;
       a.target = "_blank";
       a.textContent = title;
+      prev.addEventListener("click", () => {
+        showPreview(link);
+      });
       item.appendChild(a);
+      item.appendChild(prev);
       parent.appendChild(item);
     });
   } else if (typeof data === "object") {
@@ -319,6 +377,40 @@ function renderResources(parent, data) {
       renderResources(panel, data[key]);
     }
   }
+}
+
+function extractDriveFileId(url) {
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  return match ? match[1] : null;
+}
+
+function showPreview(link) {
+  const overlay = document.createElement('div');
+  overlay.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4";
+  const container = document.createElement('div');
+  container.className = "bg-white p-1 rounded-lg shadow-lg w-full max-w-4xl relative";
+  const closeButton = document.createElement('button');
+  closeButton.innerText = "✖";
+  closeButton.className = "absolute top-2 right-3 px-3 py-1 text-white rounded cursor-pointer text-lg close-btn";
+
+  closeButton.addEventListener('click', () => document.body.removeChild(overlay));
+  const iframeWrapper = document.createElement('div');
+  iframeWrapper.style.width = "100%";
+  iframeWrapper.style.height = "75vh";
+  iframeWrapper.style.maxHeight = "80vh";
+  const fileId = extractDriveFileId(link);
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://docs.google.com/viewer?srcid=${fileId}&pid=explorer&efh=false&a=v&chrome=false&embedded=true`;
+  iframe.style.width = "100%";
+  iframe.style.height = "100%";
+  iframe.style.border = "0";
+
+  iframeWrapper.appendChild(iframe);
+  container.appendChild(closeButton);
+  container.appendChild(iframeWrapper);
+  overlay.appendChild(container);
+
+  document.body.appendChild(overlay);
 }
 
 
