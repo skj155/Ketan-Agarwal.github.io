@@ -26,13 +26,24 @@
       background-color: var(--background);
       overflow-x: hidden;
     }
+    body.dark-mode {
+  --background: #021526;    /* Dark background */
+  --primary: #03346E;      /* Softer dark primary */
+  --secondary: #306fa0;    /* Darker secondary */
+  --back: #E2E2B6;         /* Back color */
+  color: #EEE; 
+  --back-color: black;            /* Make all text light */
+}
 
     nav {
       background: linear-gradient(90deg,rgba(40, 20, 131, 1) 0%, rgba(226, 116, 120, 1) 100%);
       color: white;
-      padding: 1rem 2rem;
+      padding: 0.5rem 1rem;
       font-size: 1.2rem;
       font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     nav a {
       text-decoration: none;
@@ -43,11 +54,10 @@
       background-color: white;
     }
 
-    .container {
+    .mycontainer {
       display: flex;
       height: calc(100vh - 60px);
     }
-
     .column {
       flex: 1;
       overflow-y: auto;
@@ -89,7 +99,7 @@
     .resource-link {
       padding: 0.4rem;
       margin: 0.2rem 0;
-      background-color: #fff;
+      background-color: var(--background)      ;
       border-right: 4px solid var(--secondary);
       border-top: 1px solid grey;
       border-left: 1px solid grey;
@@ -106,8 +116,8 @@
     }
 
     .prev-btn{
-  background-color: #fff;
-  border: 1px solid var(--primary);
+  background-color: var(--secondary);
+  border: 1px solid var(--secondary);
   padding: 5px;
   /* right: 0; */
   width: 5em;
@@ -115,11 +125,14 @@
   transition: 0.5s;
   /* font-size: 14px; */
   border-radius: 0.4em;
-position: sticky    }
+position: sticky;
+right: 0px; }
 
   .close-btn {
     background-color: var(--primary);
     transition: all 0.1s ease-in;
+    margin-right: 45px;
+    margin-top: 12px;
   }
 
   .close-btn:hover {
@@ -179,7 +192,7 @@ position: sticky    }
     }
 
     @media (max-width: 768px) {
-  .container {
+  .mycontainer {
     flex-direction: column;
     height: auto;
   }
@@ -206,6 +219,7 @@ position: sticky    }
     cursor: pointer;
     font-weight: bold;
     right: 20px;
+    color: var(--back-color);
     bottom: 10px;
   }
 
@@ -222,9 +236,9 @@ position: sticky    }
 </head>
 <body>
 
-  <nav><a href="https://www.iitk.ac.in/counsel/">Course Repository</a></nav>
+  <nav><a href="https://www.iitk.ac.in/counsel/">Course Repository</a>  <button id="darkModeToggle" ><img src="static/sun.webp" alt="" style="width: 48px;"></button></nav>
 
-  <div class="container">
+  <div class="mycontainer">
     <div class="column active" id="courseColumn">
     </div>
   
@@ -337,7 +351,7 @@ function loadResourceTypes(course) {
 function loadResources(type, course) {
   resourceColumn.innerHTML = '';
   const res = selectedCourse.resources[type];
-  const title = createElement("div", "title", `${course.code} > ${type}`);
+  const title = createElement("div", "title", `${course.code} -> ${type}`);
   resourceColumn.append(title);
 
   if (!res || (Array.isArray(res) && res.length === 0)) {
@@ -393,7 +407,7 @@ function showPreview(link) {
   const overlay = document.createElement('div');
   overlay.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4";
   const container = document.createElement('div');
-  container.className = "bg-white p-1 rounded-lg shadow-lg w-full max-w-4xl relative";
+  container.className = "bg-white p-1 rounded-lg shadow-lg w-full max-w-5xl relative";
   const closeButton = document.createElement('button');
   closeButton.innerText = "✖";
   closeButton.className = "absolute top-2 right-3 px-3 py-1 text-white rounded cursor-pointer text-lg close-btn";
@@ -418,6 +432,14 @@ function showPreview(link) {
   document.body.appendChild(overlay);
 }
 
+const darkModeToggle = document.getElementById('darkModeToggle');
+darkModeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  localStorage.setItem('dark-mode', document.body.classList.contains('dark-mode'));
+});
+if (localStorage.getItem('dark-mode') === 'true') {
+  document.body.classList.add('dark-mode');
+}
 
 
 loadCourses();
